@@ -21,40 +21,31 @@ public class PagamentoGatewayImpl implements PagamentoGateway {
     @Autowired
     private PagamentoResponseMapper mapper;
 
-    @Autowired
-    private PedidoResponseMapper pedidoMapper;
-
-    @Autowired
-    private ClienteMapper clienteMapper;
-
-    @Autowired
-    private ProdutoConsultaMapper produtoMapper;
-
     @Override
     public Optional<Pagamento> save(Pagamento pagamento) {
         PagamentoEntity entity = new PagamentoEntity(pagamento);
         PagamentoEntity savedEntity = repository.save(entity);
 
-        return Optional.of(mapper.toDomain(savedEntity,pedidoMapper,clienteMapper,produtoMapper));
+        return Optional.of(mapper.toDomain(savedEntity));
     }
 
     @Override
     public Optional<Pagamento> findByPedidoId(Long pedidoId) {
         return repository.findByPedidoId(pedidoId)
-                .map(entity -> mapper.toDomain(entity, pedidoMapper, clienteMapper, produtoMapper));
+                .map(entity -> mapper.toDomain(entity));
 
     }
 
     @Override
     public Optional<Pagamento> findByexternalReferenceMercadoPago(String externalReferenceMercadoPago) {
         return repository.findByExternalReferenceMercadoPago(externalReferenceMercadoPago)
-                .map(entity -> mapper.toDomain(entity, pedidoMapper, clienteMapper, produtoMapper));
+                .map(entity -> mapper.toDomain(entity));
     }
 
     @Override
     public List<Pagamento> findAll() {
         return repository.findAll().stream()
-                .map(entity -> mapper.toDomain(entity, pedidoMapper, clienteMapper, produtoMapper))
+                .map(entity -> mapper.toDomain(entity))
                 .toList();
     }
 }

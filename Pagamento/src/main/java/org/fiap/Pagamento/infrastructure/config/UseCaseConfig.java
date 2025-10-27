@@ -1,18 +1,15 @@
 package org.fiap.Pagamento.infrastructure.config;
 
-import org.fiap.fastfoodfase1.core.gateways.*;
-import org.fiap.fastfoodfase1.core.usercases.*;
-import org.fiap.fastfoodfase1.core.usercases.impl.*;
+
+import org.fiap.Pagamento.core.gateways.MercadoPagoGateway;
+import org.fiap.Pagamento.core.gateways.PagamentoGateway;
+import org.fiap.Pagamento.core.usercases.*;
+import org.fiap.Pagamento.core.usercases.impl.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class UseCaseConfig {
-
-    @Bean
-    public ClienteUseCases clienteUseCases(ClienteGateway clienteGateway) {
-        return new ClienteServiceImpl(clienteGateway);
-    }
 
     @Bean
     public MercadoPagoUserCases mercadoPagoUserCases(MercadoPagoGateway mercadoPagoGateway) {
@@ -28,14 +25,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public PedidoUseCases pedidoUseCases(PedidoGateway pedidoGateway, ClienteUseCases clienteUseCases, ProdutoUseCases produtoUseCases,
-                                         PagamentoGateway pagamentoGateway) {
-        return new PedidoServiceImpl(pedidoGateway, clienteUseCases, produtoUseCases, pagamentoGateway);
-    }
-
-    @Bean
-    public ProdutoUseCases produtoUseCases(ProdutoGateway produtoGateway) {
-        return new ProdutoServiceImpl(produtoGateway);
+    public PedidoUseCases pedidoUseCases() {
+        return new PedidoServiceImpl();
     }
 
     @Bean

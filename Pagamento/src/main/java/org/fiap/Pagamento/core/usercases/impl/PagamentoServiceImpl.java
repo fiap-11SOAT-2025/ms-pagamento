@@ -9,8 +9,10 @@ import org.fiap.Pagamento.core.gateways.MercadoPagoGateway;
 import org.fiap.Pagamento.core.gateways.PagamentoGateway;
 import org.fiap.Pagamento.core.usercases.MercadoPagoUserCases;
 import org.fiap.Pagamento.core.usercases.PagamentoUseCases;
+import org.fiap.Pagamento.core.usercases.PedidoUseCases;
 import org.fiap.Pagamento.core.usercases.QrCodeUserCases;
 import org.fiap.Pagamento.presentation.dto.mercadopago.MercadoPagoOrderResponseDTO;
+import org.fiap.Pagamento.presentation.dto.mercadopago.OrderMercadoPagoDTO;
 
 import java.math.BigDecimal;
 import java.util.List;

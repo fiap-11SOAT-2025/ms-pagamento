@@ -4,21 +4,21 @@ package org.fiap.Pagamento.core.entities;
 public class Pagamento {
 
     private Long id ;
-    private Pedido pedido;
+    private String pedidoId;
     private String qrCodeMercadoPago;
     private String externalReferenceMercadoPago;
     private Integer statusPagamentoId;
 
-    public Pagamento(Long id, Pedido pedido, String qrCodeMercadoPago, String externalReferenceMercadoPago,
+    public Pagamento(Long id, String pedidoId, String qrCodeMercadoPago, String externalReferenceMercadoPago,
                      Integer statusPagamentoId) {
-        if (pedido == null) {
+        if (pedidoId == null) {
             throw new IllegalArgumentException("Pagamento deve estar associado a um pedido.");
         }
         if (statusPagamentoId == null) {
             throw new IllegalArgumentException("Status do pagamento é obrigatório.");
         }
         this.id = id;
-        this.pedido = pedido;
+        this.pedidoId = pedidoId;
         this.qrCodeMercadoPago = qrCodeMercadoPago;
         this.externalReferenceMercadoPago = externalReferenceMercadoPago;
         this.statusPagamentoId = statusPagamentoId;
@@ -28,8 +28,8 @@ public class Pagamento {
         return id;
     }
 
-    public Pedido getPedido() {
-        return pedido;
+    public String getPedidoId() {
+        return pedidoId;
     }
 
     public String getQrCodeMercadoPago() {
@@ -56,8 +56,8 @@ public class Pagamento {
         this.statusPagamentoId = statusPagamentoId;
     }
 
-    public Pagamento(Pedido pedido, String qrCodeMercadoPago, String externalReferenceMercadoPago, Integer statusPagamentoId) {
-        this.pedido = pedido;
+    public Pagamento(String pedidoId, String qrCodeMercadoPago, String externalReferenceMercadoPago, Integer statusPagamentoId) {
+        this.pedidoId = pedidoId;
         this.qrCodeMercadoPago = qrCodeMercadoPago;
         this.externalReferenceMercadoPago = externalReferenceMercadoPago;
         this.statusPagamentoId = statusPagamentoId;

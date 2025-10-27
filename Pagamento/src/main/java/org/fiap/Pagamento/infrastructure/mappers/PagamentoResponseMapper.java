@@ -12,7 +12,7 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = PedidoResponseMapper.class)
+@Mapper(componentModel = "spring")
 public interface PagamentoResponseMapper {
 
     @Mapping(source = "statusPagamentoId", target = "statusPagamento", qualifiedByName = "statusPagamentoIdToStatusPagamento")
@@ -21,20 +21,13 @@ public interface PagamentoResponseMapper {
     List<PagamentoDTO> entidadesParaDtos(List<Pagamento> pagamentos);
 
     // Método toDomain com @Context para injetar dependências de mappers
-    default Pagamento toDomain(PagamentoEntity entity,
-                               @Context PedidoResponseMapper pedidoResponseMapper,
-                               @Context ClienteMapper clienteMapper,
-                               @Context ProdutoConsultaMapper produtoMapper) {
-        if (entity == null) return null;
+    default Pagamento toDomain(PagamentoEntity entity) {
 
-        Pedido pedido = null;
-        if (entity.getPedido() != null) {
-            pedido = pedidoResponseMapper.toDomain(entity.getPedido(), clienteMapper, produtoMapper);
-        }
+        if (entity == null) return null;
 
         return new Pagamento(
                 entity.getId(),
-                pedido,
+                entity.pedidoId(),
                 entity.getQrCodeMercadoPago(),
                 entity.getExternalReferenceMercadoPago(),
                 entity.getStatusPagamentoId()

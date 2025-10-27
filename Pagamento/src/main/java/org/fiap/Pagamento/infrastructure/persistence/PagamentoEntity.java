@@ -19,9 +19,7 @@ public class PagamentoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
 
-    @OneToOne
-    @JoinColumn(name = "pedido_id", unique = true)
-    private PedidoEntity pedido;
+    private String pedidoId;
 
     private String qrCodeMercadoPago;
 
@@ -29,15 +27,15 @@ public class PagamentoEntity {
 
     private Integer statusPagamentoId;
 
-    public PagamentoEntity(PedidoEntity pedido, String qrCodeMercadoPago, Integer statusPagamentoId) {
-        this.pedido = pedido;
+    public PagamentoEntity(String pedidoId, String qrCodeMercadoPago, Integer statusPagamentoId) {
+        this.pedidoId = pedidoId;
         this.qrCodeMercadoPago = qrCodeMercadoPago;
         this.statusPagamentoId = statusPagamentoId;
     }
 
     public PagamentoEntity(Pagamento pagamento) {
         this.id = pagamento.getId();
-        this.pedido = new PedidoEntity(pagamento.getPedido());
+        this.pedidoId = pagamento.getPedidoId();
         this.qrCodeMercadoPago = pagamento.getQrCodeMercadoPago();
         this.externalReferenceMercadoPago = pagamento.getExternalReferenceMercadoPago();
 
