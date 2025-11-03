@@ -1,6 +1,5 @@
 package org.fiap.Pagamento.infrastructure.gateways;
 
-]
 import org.fiap.Pagamento.core.entities.Pagamento;
 import org.fiap.Pagamento.core.gateways.PagamentoGateway;
 import org.fiap.Pagamento.infrastructure.mappers.PagamentoResponseMapper;
@@ -30,7 +29,7 @@ public class PagamentoGatewayImpl implements PagamentoGateway {
     }
 
     @Override
-    public Optional<Pagamento> findByPedidoId(Long pedidoId) {
+    public Optional<Pagamento> findByPedidoId(String pedidoId) {
         return repository.findByPedidoId(pedidoId)
                 .map(entity -> mapper.toDomain(entity));
 

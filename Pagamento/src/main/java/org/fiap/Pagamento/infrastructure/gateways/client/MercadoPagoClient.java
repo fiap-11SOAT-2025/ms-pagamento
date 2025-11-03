@@ -1,4 +1,4 @@
-package org.fiap.Pagamento.infrastructure.gateways;
+package org.fiap.Pagamento.infrastructure.gateways.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -6,6 +6,7 @@ import org.fiap.Pagamento.core.gateways.MercadoPagoGateway;
 import org.fiap.Pagamento.presentation.dto.mercadopago.MercadoPagoOrderResponseDTO;
 import org.fiap.Pagamento.presentation.dto.mercadopago.OrderMercadoPagoDTO;
 import org.fiap.Pagamento.presentation.dto.mercadopago.StatusMerchantOrderMercadoPagoDTO;
+import org.fiap.Pagamento.presentation.dto.pedido.PedidoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -33,10 +34,10 @@ public class MercadoPagoClient implements MercadoPagoGateway {
     }
 
     @Override
-    public MercadoPagoOrderResponseDTO geraQrCodePagamento(OrderMercadoPagoDTO orderMercadoPagoDTO, Pedido pedido)  {
+    public MercadoPagoOrderResponseDTO geraQrCodePagamento(OrderMercadoPagoDTO orderMercadoPagoDTO, PedidoDTO pedido)  {
 
         String endpoint = "/v1/orders";
-        String keyPedido= "MCPG00"+ String.format("%04d", pedido.getId());
+        String keyPedido = "MCPG00-" + pedido.id().replaceAll("-", "");
 
         return webClient.post()
                 .uri(endpoint)

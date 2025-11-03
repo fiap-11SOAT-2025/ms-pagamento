@@ -11,7 +11,7 @@ public interface PagamentoGateway {
 
     Optional<Pagamento> save(Pagamento pagamento);
 
-    Optional<Pagamento> findByPedidoId (Long pedidoId);
+    Optional<Pagamento> findByPedidoId (String pedidoId);
 
     Optional<Pagamento> findByexternalReferenceMercadoPago (String externalReferenceMercadoPago);
 

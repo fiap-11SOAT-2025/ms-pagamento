@@ -19,12 +19,12 @@ public class PagamentoControllerImpl implements PagamentoController {
 
 
     @Override
-    public Pagamento geraQrCodePagamentoMercadoPago(Long idPedido) {
+    public Pagamento geraQrCodePagamentoMercadoPago(String idPedido) {
         return pagamentoUseCases.geraQrCodePagamentoMercadoPago(idPedido);
     }
 
     @Override
-    public byte[] vizualizarQrCodePagamentoMercadoPago(Long idPedido) {
+    public byte[] vizualizarQrCodePagamentoMercadoPago(String idPedido) {
         return pagamentoUseCases.vizualizarQrCodePagamentoMercadoPago(idPedido);
     }
 
@@ -34,7 +34,7 @@ public class PagamentoControllerImpl implements PagamentoController {
     }
 
     @Override
-    public Pagamento consultaStatusPagamento(Long idPedido) {
+    public Pagamento consultaStatusPagamento(String idPedido) {
         return pagamentoUseCases.buscaPagamentoPorPedidoId(idPedido);
     }
 }

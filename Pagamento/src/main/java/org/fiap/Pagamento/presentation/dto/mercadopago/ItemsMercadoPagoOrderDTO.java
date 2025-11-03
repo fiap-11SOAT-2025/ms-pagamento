@@ -1,6 +1,8 @@
 package org.fiap.Pagamento.presentation.dto.mercadopago;
 
 
+import java.math.BigDecimal;
+
 /**
  * DTO representando um item no pagamento.
  * <p>
@@ -18,7 +20,7 @@ public record ItemsMercadoPagoOrderDTO(
         Integer quantity,
         String unit_measure
 ) {
-    public ItemsMercadoPagoOrderDTO (Produto produto, Integer quantidade) {
-        this(produto.getNome(), produto.getPreco().toString(), quantidade,"unit");
+    public ItemsMercadoPagoOrderDTO (String produto, Integer quantidade, BigDecimal preco) {
+        this(produto, preco.toString(), quantidade,"unit");
     }
 }

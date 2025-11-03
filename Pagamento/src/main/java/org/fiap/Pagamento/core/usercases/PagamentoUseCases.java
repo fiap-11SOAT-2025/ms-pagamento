@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface PagamentoUseCases {
 
-    Pagamento geraQrCodePagamentoMercadoPago(Long idPedido);
+    Pagamento geraQrCodePagamentoMercadoPago(String idPedido);
 
-    byte[] vizualizarQrCodePagamentoMercadoPago(Long idPedido);
+    byte[] vizualizarQrCodePagamentoMercadoPago(String idPedido);
 
-    Pagamento buscaPagamentoPorPedidoId(Long idPedido);
+    Pagamento buscaPagamentoPorPedidoId(String idPedido);
 
     Pagamento buscaPagamentoPorExternalReference(String externalReference);
 

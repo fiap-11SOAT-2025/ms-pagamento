@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface PagamentoController {
 
-    Pagamento geraQrCodePagamentoMercadoPago(Long idPedido);
+    Pagamento geraQrCodePagamentoMercadoPago(String idPedido);
 
-    byte[] vizualizarQrCodePagamentoMercadoPago(Long idPedido);
+    byte[] vizualizarQrCodePagamentoMercadoPago(String idPedido);
 
     List<Pagamento> buscaPagamentos();
 
-    Pagamento consultaStatusPagamento(Long idPedido);
+    Pagamento consultaStatusPagamento(String idPedido);
 }

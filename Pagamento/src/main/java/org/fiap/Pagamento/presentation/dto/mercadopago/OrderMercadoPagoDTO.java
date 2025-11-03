@@ -2,6 +2,8 @@ package org.fiap.Pagamento.presentation.dto.mercadopago;
 
 
 
+import org.fiap.Pagamento.presentation.dto.pedido.PedidoDTO;
+
 import java.util.List;
 
 /**
@@ -24,7 +26,7 @@ public record OrderMercadoPagoDTO(
         List<ItemsMercadoPagoOrderDTO> items
 ) {
 
-    public OrderMercadoPagoDTO(Pedido pedido, ConfigMercadoPagoOrderDTO config, TransactionsMercadoPagoOrderDTO transactions, List<ItemsMercadoPagoOrderDTO> items) {
-        this("qr","MCPG00"+ String.format("%04d", pedido.getId()),config,transactions,items);
+    public OrderMercadoPagoDTO(PedidoDTO pedido, ConfigMercadoPagoOrderDTO config, TransactionsMercadoPagoOrderDTO transactions, List<ItemsMercadoPagoOrderDTO> items) {
+        this("qr","MCPG00-" + pedido.id().toString().replaceAll("-", ""),config,transactions,items);
     }
 }

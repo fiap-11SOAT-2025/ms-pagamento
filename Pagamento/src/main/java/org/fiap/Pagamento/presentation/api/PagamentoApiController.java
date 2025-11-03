@@ -21,19 +21,19 @@ public class PagamentoApiController {
     private PagamentoResponseMapper mapper;
 
     @PostMapping("/gerar-qrCode/{idPedido}")
-    public ResponseEntity<PagamentoDTO> gerarQrCodePagamentoMercadoPago(@PathVariable Long idPedido){
+    public ResponseEntity<PagamentoDTO> gerarQrCodePagamentoMercadoPago(@PathVariable String idPedido){
         Pagamento pagamento= pagamentoController.geraQrCodePagamentoMercadoPago(idPedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.entidadeParaDto(pagamento));
     }
 
     @PostMapping("/visualizar-qrCode/{idPedido}")
-    public ResponseEntity<byte[]> visualizarQrCodePagamentoMercadoPago(@PathVariable Long idPedido){
+    public ResponseEntity<byte[]> visualizarQrCodePagamentoMercadoPago(@PathVariable String idPedido){
         byte[] qrCodePagamento= pagamentoController.vizualizarQrCodePagamentoMercadoPago(idPedido);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/png").body(qrCodePagamento);
     }
 
     @GetMapping("/status/{idPedido}")
-    public ResponseEntity<PagamentoDTO> consultaStatusPagamento(@PathVariable Long idPedido){
+    public ResponseEntity<PagamentoDTO> consultaStatusPagamento(@PathVariable String idPedido){
         Pagamento pagamento = pagamentoController.consultaStatusPagamento(idPedido);
         return ResponseEntity.ok().body(mapper.entidadeParaDto(pagamento));
     }

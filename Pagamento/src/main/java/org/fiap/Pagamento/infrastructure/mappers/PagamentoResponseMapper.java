@@ -27,7 +27,7 @@ public interface PagamentoResponseMapper {
 
         return new Pagamento(
                 entity.getId(),
-                entity.pedidoId(),
+                entity.getPedidoId(),
                 entity.getQrCodeMercadoPago(),
                 entity.getExternalReferenceMercadoPago(),
                 entity.getStatusPagamentoId()
