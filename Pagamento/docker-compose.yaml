@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_microservice_pagamento
+    restart: always
+    environment:
+      POSTGRES_DB: microservice
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8080"
+    container_name: api-pagamento
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/microservice
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      APP_PORT: 8080
+      APP_NAME: api-pagamento
+      MP_USER_ID: 2409646693
+      MP_EXTERNAL_POS_ID: FIAP001POS
+      MP_TOKEN: APP_USR-5511707722892084-042814-00c965a2a4ecf4475115062da61fb13d-2409646693
+      MS_PEDIDO_HOST: http://host.docker.internal::8081
+      MS_PRODUCAO_HOST: http://host.docker.internal::8082
+
+volumes:
+  pgdata:
