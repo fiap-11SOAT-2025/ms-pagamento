@@ -1,8 +1,8 @@
 package org.fiap.Pagamento.infrastructure.gateways.client;
 
 import org.fiap.Pagamento.core.gateways.PedidoGateway;
-import org.fiap.Pagamento.presentation.dto.mercadopago.MercadoPagoOrderResponseDTO;
 import org.fiap.Pagamento.presentation.dto.pedido.PedidoDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,12 +14,11 @@ public class PedidoClient implements PedidoGateway {
 
     private final WebClient webClient;
 
-    @Value("${api.pedido.host}")
-    String hostApiPedido;
-
-    public PedidoClient(WebClient.Builder webClientBuilder) {
+    @Autowired
+    public PedidoClient(WebClient.Builder webClientBuilder, @Value("${api.pedido.host}") String hostApiPedido) {
         this.webClient = webClientBuilder.baseUrl(hostApiPedido).build();
     }
+
 
     @Override
     public PedidoDTO buscarPedidoPorId(String pedidoId) {

@@ -27,11 +27,6 @@ public class PagamentoEntity {
 
     private Integer statusPagamentoId;
 
-    public PagamentoEntity(String pedidoId, String qrCodeMercadoPago, Integer statusPagamentoId) {
-        this.pedidoId = pedidoId;
-        this.qrCodeMercadoPago = qrCodeMercadoPago;
-        this.statusPagamentoId = statusPagamentoId;
-    }
 
     public PagamentoEntity(Pagamento pagamento) {
         this.id = pagamento.getId();

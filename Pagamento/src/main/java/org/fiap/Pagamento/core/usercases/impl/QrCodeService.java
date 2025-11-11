@@ -38,7 +38,7 @@ public class QrCodeService implements QrCodeUserCases {
             ImageIO.write(image, "PNG", outputStream);
             return outputStream.toByteArray();
 
-        } catch (WriterException | IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar QR Code", e);
         }
     }

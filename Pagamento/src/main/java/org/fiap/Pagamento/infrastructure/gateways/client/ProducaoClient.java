@@ -1,8 +1,10 @@
 package org.fiap.Pagamento.infrastructure.gateways.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fiap.Pagamento.core.exception.RecursoNaoEncontradoExcecao;
 import org.fiap.Pagamento.core.gateways.ProducaoGateway;
 import org.fiap.Pagamento.presentation.dto.producao.StatusPedidoDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,10 +15,9 @@ public class ProducaoClient implements ProducaoGateway {
 
     private final WebClient webClient;
 
-    @Value("${api.producao.host}")
-    String hostApiproducao;
-
-    public ProducaoClient(WebClient.Builder webClientBuilder) {
+    @Autowired
+    public ProducaoClient(WebClient.Builder webClientBuilder,
+                          @Value("${api.producao.host}") String hostApiproducao) {
         this.webClient = webClientBuilder.baseUrl(hostApiproducao).build();
     }
 
