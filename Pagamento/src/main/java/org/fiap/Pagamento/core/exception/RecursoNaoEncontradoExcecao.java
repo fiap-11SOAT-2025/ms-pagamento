@@ -7,7 +7,4 @@ public class RecursoNaoEncontradoExcecao extends RuntimeException {
         super(mensagem);
     }
 
-    public RecursoNaoEncontradoExcecao(String mensagem, Throwable causa) {
-        super(mensagem, causa);
-    }
 }
