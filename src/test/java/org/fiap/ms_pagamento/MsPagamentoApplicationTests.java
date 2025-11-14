@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class PagamentoApplicationTests {
+class MsPagamentoApplicationTests {
 
 	@Test
 	void contextLoads() {
