@@ -111,3 +111,51 @@ A aplicação `ms-pagamento` estará disponível em `http://localhost:8083`.
 A documentação da API (Swagger UI) estará disponível nos seguintes endereços:
 
 * `http://localhost:8083/swagger-ui.html`
+
+# 🛒 Mercado Pago Integração
+
+Este projeto realiza integração com a API do Mercado Pago utilizando usuários de teste e credenciais de produção.
+
+## 👥 Usuários de Teste
+
+**Vendedor**
+- **Usuário:** `TESTUSER2100620288`
+- **Senha:** `SRHXCeMVF3`
+
+**Comprador**
+- **Usuário:** `TESTUSER1771181847`
+- **Senha:** `CKO9WMVmLh`
+
+## 🔐 Credenciais de Produção
+
+Estas credenciais foram criadas a partir do usuário de teste **Vendedor** e são necessárias para realizar chamadas à API do Mercado Pago:
+
+| Campo | Valor |
+| :--- | :--- |
+| **Access Token** | `APP_USR-5511707722892084-042814-00c965a2a4ecf4475115062da61fb13d-2409646693` |
+| **User ID** | `2409646693` |
+| **POS_EXTERNAL_ID** | `FIAP001POS` |
+
+## ⚙️ Configuração no `application.yml`
+
+As credenciais devem ser configuradas no seu `application.yml` da seguinte forma:
+
+```yaml
+api:
+  mercadopago:
+    userId: 2409646693
+    externalPosId: FIAP001POS
+    token: APP_USR-5511707722892084-042814-00c965a2a4ecf4475115062da61fb13d-2409646693
+```
+## 📲 Teste do QR Code
+
+Para testar se o QR Code gerado está funcionando corretamente:
+
+1. Baixe o aplicativo do [Mercado Pago](https://www.mercadopago.com.br/) no seu celular.
+2. Faça login no app utilizando as credenciais de **Comprador**:
+   - **Usuário:** `TESTUSER1771181847`
+   - **Senha:** `CKO9WMVmLh`
+3. Escaneie o QR Code gerado pela aplicação.
+4. Realize o pagamento utilizando o saldo fictício.
+
+> 💡 **Dica:** O usuário comprador possui **dinheiro fictício**, permitindo simular pagamentos sem custo real.
