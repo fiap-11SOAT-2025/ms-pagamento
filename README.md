@@ -1,2 +1,3 @@
-# API-Pagamento
-API responsável por operacionalizar a cobrança de um  pedido, registrando a solicitação de pagamento, recebendo o  retorno do processador de pagamento e atualizando o status do  pedido.
+# ms-pagamento
+
+Microserviço responsável por operacionalizar a cobrança de um  pedido, registrando a solicitação de pagamento, recebendo o  retorno do processador de pagamento e atualizando o status do  pedido.
