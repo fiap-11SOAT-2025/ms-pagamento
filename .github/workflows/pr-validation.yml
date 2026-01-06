@@ -51,10 +51,11 @@ jobs:
             if [ $TOTAL -gt 0 ]; then
               PERCENTAGE=$((COVERAGE * 100 / TOTAL))
               echo "Coverage: ${PERCENTAGE}%"
-              if [ $PERCENTAGE -lt 80 ]; then
-                echo "::warning::Coverage is below 80% threshold: ${PERCENTAGE}%"
+              if [ $PERCENTAGE -lt 70 ]; then
+                echo "::error::Coverage is below 70% threshold: ${PERCENTAGE}%"
+                exit 1
               else
-                echo "::notice::Coverage meets 80% threshold: ${PERCENTAGE}%"
+                echo "::notice::Coverage meets 70% threshold: ${PERCENTAGE}%"
               fi
             fi
           fi
