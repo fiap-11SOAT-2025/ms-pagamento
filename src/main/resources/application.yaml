@@ -1,26 +1,49 @@
 server:
-  port: ${APP_PORT:8080}
+  port: 8080
 
 spring:
   application:
     name: ${APP_NAME:ms-pagamento}
 
+  # 1. Importa o segredo ao iniciar a aplicação
+  config:
+    import: "database-credentials20260106135621376700000001"
+    
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      secretsmanager:
+        enabled: true
+
   datasource:
+    # O Spring Cloud AWS vai ler o JSON do segredo e injetar os valores nestas variáveis
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
     show-sql: true
 
+# Configurações do Mercado Pago
 api:
   mercadopago:
     userId: ${MP_USER_ID}
     externalPosId: ${MP_EXTERNAL_POS_ID}
     token: ${MP_TOKEN}
-  pedido:
-    host: ${MS_PEDIDO_HOST}
-  producao:
-    host: ${MS_PRODUCAO_HOST}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: always
