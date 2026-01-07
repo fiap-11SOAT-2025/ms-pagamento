@@ -1,4 +1,4 @@
-name: Deploy ms-pagamento to EKS
+name: Deploy Application to EKS
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 env:
   AWS_REGION: us-east-1
   EKS_CLUSTER_NAME: fiap-eks-cluster
-  ECR_REPOSITORY: fiap-app-ms-pagamento
-  ECR_REGISTRY: 068504458505.dkr.ecr.us-east-1.amazonaws.com
+  # Nome EXATO do repositório criado no seu Terraform
+  ECR_REPOSITORY_NAME: fiap-app-ms-pagamento
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up JDK 21
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v3
       with:
         java-version: '21'
         distribution: 'temurin'
@@ -47,13 +47,13 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Constrói a imagem
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        # Envia para o ECR
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        # Usamos sintaxe bash $VAR para evitar erros de interpolação
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Update Kubeconfig
       run: |
@@ -62,31 +62,41 @@ jobs:
     - name: Deploy to EKS
       run: |
         # 1. Atualiza a imagem no manifesto de deployment
-        sed -i 's|<IMAGE_URL_PLACEHOLDER>|${{ steps.build-image.outputs.image }}|g' k8s/app-deployment.yaml
+        sed -i 's|<IMAGE_URL_PLACEHOLDER>|${{ steps.build-image.outputs.image }}|g' k8s-manifests/app-deployment.yaml
         
-        # 2. Deploy do Banco de Dados (Postgres Interno para o ms-pagamento)
-        kubectl apply -f k8s/postgres-secret.yaml
-        kubectl apply -f k8s/postgres-deployment.yaml
+        # 2. Busca os Segredos na AWS (Usando o nome do seu secret)
+        # O comando abaixo pega o JSON completo
+        SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id database-credentials20260106135621376700000001 --query SecretString --output text)
+        
+        # Extrai os valores usando jq (já instalado no ubuntu-latest)
+        DB_URL=$(echo $SECRET_JSON | jq -r .DB_URL)
+        DB_USERNAME=$(echo $SECRET_JSON | jq -r .DB_USERNAME)
+        DB_PASSWORD=$(echo $SECRET_JSON | jq -r .DB_PASSWORD)
 
-        # 3. Criação do Secret da Aplicação (Credenciais Mercado Pago e Banco)
-        # Recria o secret para garantir atualização dos valores
-        kubectl delete secret ms-pagamento-secret --ignore-not-found
-        kubectl create secret generic ms-pagamento-secret \
-          --from-literal=DB_USERNAME='root' \
-          --from-literal=DB_PASSWORD='root' \
+        # 3. Cria/Atualiza o Secret da Aplicação no Kubernetes
+        # Removemos o secret antigo para recriar com os valores novos da AWS
+        kubectl delete secret app-secret --ignore-not-found
+        
+        kubectl create secret generic app-secret \
+          --from-literal=DB_URL="$DB_URL" \
+          --from-literal=DB_USERNAME="$DB_USERNAME" \
+          --from-literal=DB_PASSWORD="$DB_PASSWORD" \
           --from-literal=MP_USER_ID='2409646693' \
           --from-literal=MP_EXTERNAL_POS_ID='FIAP001POS' \
           --from-literal=MP_TOKEN='APP_USR-5511707722892084-042814-00c965a2a4ecf4475115062da61fb13d-2409646693' \
           --dry-run=client -o yaml | kubectl apply -f -
 
-        # 4. Aplica manifestos da Aplicação
-        kubectl apply -f k8s/app-config.yaml
-        kubectl apply -f k8s/app-deployment.yaml
-        kubectl apply -f k8s/app-service.yaml
-        kubectl apply -f k8s/hpa.yaml
-
+        # 4. Sobe a Aplicação (SEM O POSTGRES)
+        # Removemos as linhas do postgres-deployment e postgres-secret
+        kubectl apply -f k8s-manifests/app-config.yaml
+        kubectl apply -f k8s-manifests/app-deployment.yaml
+        kubectl apply -f k8s-manifests/app-service.yaml
+        kubectl apply -f k8s-manifests/hpa.yaml
+        
     - name: Verify Deployment
       run: |
-        echo "Aguardando rollout..."
-        kubectl rollout status deployment/ms-pagamento || true
+        echo "Aguardando rollout do deployment..."
+        kubectl rollout status deployment/app-deployment || true
+        
+        echo "Serviços disponíveis:"
         kubectl get svc
