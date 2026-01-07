@@ -93,6 +93,11 @@
 			<version>7.20.1</version>
 		</dependency>
 		<dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-secrets-manager</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-junit-platform-engine</artifactId>
 			<version>7.20.1</version>
