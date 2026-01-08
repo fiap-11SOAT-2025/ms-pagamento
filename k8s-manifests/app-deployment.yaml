@@ -16,7 +16,7 @@ spec:
       
       containers:
         - name: ms-pagamento-container
-          image: <IMAGE_URL_PLACEHOLDER> # O pipeline substitui isso automaticamente
+          image: REPLACE_ME_IMAGE_URL # O pipeline substitui isso automaticamente
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -38,10 +38,11 @@ spec:
           # AQUI ESTÁ A CORREÇÃO DO ERRO:
           # ... (dentro de containers, logo após envFrom)
           env:
-            # Desabilita o Secrets Manager explicitamente no Cluster para economizar recursos
+            # CORREÇÃO: Habilita o Secrets Manager para pegar DB_URL, Token MP, etc.
             - name: SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED
-              value: "false"
-            # Removemos a tentativa falha de sobrescrever o SPRING_CONFIG_IMPORT via env
+              value: "true" 
+            - name: AWS_REGION
+              value: "us-east-1"
 
           livenessProbe:
             httpGet:
