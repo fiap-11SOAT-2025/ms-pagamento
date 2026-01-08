@@ -1,23 +1,24 @@
 server:
-  port: 8080
+  port: ${APP_PORT:8080}
 
 spring:
   application:
     name: ms-pagamento
 
-  # 1. Importa o segredo ao iniciar a aplicação
+  # Importa o segredo específico da AWS
   config:
     import: "optional:aws-secretsmanager:database-credentials20260106135621376700000001"
-    
+
   cloud:
     aws:
       region:
         static: us-east-1
       secretsmanager:
-        enabled: true
+        # Permite desativar via variável de ambiente (útil para testes locais)
+        enabled: ${SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED:true}
 
   datasource:
-    # O Spring Cloud AWS vai ler o JSON do segredo e injetar os valores nestas variáveis
+    # Valores injetados automaticamente pelo Secrets Manager
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -32,12 +33,18 @@ spring:
         format_sql: true
     show-sql: true
 
-# Configurações do Mercado Pago
+# Configurações de Integração (Todas agrupadas sob 'api')
 api:
   mercadopago:
     userId: ${MP_USER_ID}
     externalPosId: ${MP_EXTERNAL_POS_ID}
     token: ${MP_TOKEN}
+  
+  # Novas configurações para comunicação entre microsserviços
+  pedido:
+    host: ${MS_PEDIDO_HOST}
+  producao:
+    host: ${MS_PRODUCAO_SERVER}
 
 management:
   endpoints:
