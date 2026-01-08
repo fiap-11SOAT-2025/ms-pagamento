@@ -16,7 +16,7 @@ spec:
       
       containers:
         - name: ms-pagamento-container
-          image: REPLACE_ME_IMAGE_URL # O pipeline substitui isso automaticamente
+          image: <IMAGE_URL_PLACEHOLDER> # O pipeline substitui isso automaticamente
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
