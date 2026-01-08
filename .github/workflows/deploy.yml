@@ -62,7 +62,7 @@ jobs:
     - name: Deploy to EKS
       run: |
         # 1. Atualiza a imagem no manifesto de deployment
-        sed -i 's|<IMAGE_URL_PLACEHOLDER>|${{ steps.build-image.outputs.image }}|g' k8s-manifests/app-deployment.yaml
+        sed -i 's|REPLACE_ME_IMAGE_URL|${{ steps.build-image.outputs.image }}|g' k8s-manifests/app-deployment.yaml
         
         # 2. Busca os Segredos na AWS (Usando o nome do seu secret)
         # O comando abaixo pega o JSON completo
