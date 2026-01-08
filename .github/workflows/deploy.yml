@@ -66,8 +66,7 @@ jobs:
         kubectl apply -f k8s-manifests/app-config.yaml
         kubectl apply -f k8s-manifests/app-deployment.yaml
         kubectl apply -f k8s-manifests/app-service.yaml
-        # Se tiver HPA, descomente:
-        # kubectl apply -f k8s-manifests/hpa.yaml
+        kubectl apply -f k8s-manifests/hpa.yaml
         
     - name: Verify Deployment
       run: |
