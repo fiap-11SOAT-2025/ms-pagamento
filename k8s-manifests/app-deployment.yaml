@@ -38,12 +38,29 @@ spec:
           # AQUI ESTÁ A CORREÇÃO DO ERRO:
           # ... (dentro de containers, logo após envFrom)
           env:
-            # CORREÇÃO: Habilita o Secrets Manager para pegar DB_URL, Token MP, etc.
+            # Habilita o Secrets Manager
             - name: SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED
-              value: "true" 
+              value: "true"
             - name: AWS_REGION
               value: "us-east-1"
-
+            
+            # --- ADICIONE ESTE BLOCO DE CREDENCIAIS ---
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_secret_access_key
+            - name: AWS_SESSION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_session_token
+                  
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
