@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-pagamento
-  namespace: default
   labels:
     app: ms-pagamento
 spec:
@@ -17,33 +16,36 @@ spec:
     spec:
       containers:
         - name: ms-pagamento-container
+          # O pipeline substitui isto pela imagem real
           image: REPLACE_ME_IMAGE_URL
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
           
-          # Health Checks (Mantive os seus, estão ótimos)
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 15
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 15
+          # Recursos (Mantive os originais, ajuste se necessário)
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1.5Gi"
+
+          # Carrega apenas configurações não-sensíveis (ex: Profiles)
+          envFrom:
+            - configMapRef:
+                name: app-configmap
+            # REMOVIDO: - secretRef: name: app-secret 
+            # (Já não precisamos dele, a app busca tudo na AWS direto)
 
           env:
-            # --- CONFIGURAÇÃO AWS (PERFEITA) ---
+            # 1. Ativa a integração com AWS Secrets Manager
             - name: SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED
               value: "true"
             - name: AWS_REGION
               value: "us-east-1"
-            
-            # Credenciais para conectar na AWS
+
+            # 2. Injeta as Credenciais da AWS (Essencial para o Spring iniciar)
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -59,7 +61,17 @@ spec:
                 secretKeyRef:
                   name: aws-credentials
                   key: aws_session_token
-            
-            # Variáveis da Aplicação (Opcional, se precisar sobrescrever algo)
-            - name: APP_PORT
-              value: "8080"
+
+          # Health Checks (Ajudam o K8s a saber se a app travou)
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
