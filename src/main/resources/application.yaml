@@ -42,7 +42,7 @@ api:
   
   # Novas configurações para comunicação entre microsserviços
   pedido:
-    host: ${MS_PEDIDO_HOST}
+    host: ${MS_PEDIDO_SERVER}
   producao:
     host: ${MS_PRODUCAO_SERVER}
 
