@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ms-pagamento
+  namespace: default
+  labels:
+    app: ms-pagamento
 spec:
   replicas: 1
   selector:
@@ -12,39 +15,35 @@ spec:
       labels:
         app: ms-pagamento
     spec:
-      # REMOVIDO: initContainers (não precisamos mais esperar o postgres local)
-      
       containers:
         - name: ms-pagamento-container
-          image: REPLACE_ME_IMAGE_URL # O pipeline substitui isso automaticamente
+          image: REPLACE_ME_IMAGE_URL
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          resources:
-            requests:
-              cpu: "300m"
-              memory: "512Mi"
-            limits:
-              cpu: "1000m"
-              memory: "1.5Gi"
           
-          # Carrega as variáveis (DB_URL, USER, PASS) injetadas pelo Pipeline
-          envFrom:
-            - configMapRef:
-                name: app-configmap
-            - secretRef:
-                name: app-secret
-          
-          # AQUI ESTÁ A CORREÇÃO DO ERRO:
-          # ... (dentro de containers, logo após envFrom)
+          # Health Checks (Mantive os seus, estão ótimos)
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
+
           env:
-            # Habilita o Secrets Manager
+            # --- CONFIGURAÇÃO AWS (PERFEITA) ---
             - name: SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED
               value: "true"
             - name: AWS_REGION
               value: "us-east-1"
             
-            # --- ADICIONE ESTE BLOCO DE CREDENCIAIS ---
+            # Credenciais para conectar na AWS
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -60,16 +59,7 @@ spec:
                 secretKeyRef:
                   name: aws-credentials
                   key: aws_session_token
-                  
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 15
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 15
+            
+            # Variáveis da Aplicação (Opcional, se precisar sobrescrever algo)
+            - name: APP_PORT
+              value: "8080"
