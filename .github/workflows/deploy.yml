@@ -8,7 +8,6 @@ on:
 env:
   AWS_REGION: us-east-1
   EKS_CLUSTER_NAME: fiap-eks-cluster
-  # Nome EXATO do repositório criado no seu Terraform
   ECR_REPOSITORY_NAME: fiap-app-ms-pagamento
 
 jobs:
@@ -50,7 +49,6 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Usamos sintaxe bash $VAR para evitar erros de interpolação
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
@@ -61,42 +59,21 @@ jobs:
 
     - name: Deploy to EKS
       run: |
-        # 1. Atualiza a imagem no manifesto de deployment
+        # 1. Atualiza a imagem no manifesto
         sed -i 's|REPLACE_ME_IMAGE_URL|${{ steps.build-image.outputs.image }}|g' k8s-manifests/app-deployment.yaml
         
-        # 2. Busca os Segredos na AWS (Usando o nome do seu secret)
-        # O comando abaixo pega o JSON completo
-        SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id database-credentials20260106135621376700000001 --query SecretString --output text)
-        
-        # Extrai os valores usando jq (já instalado no ubuntu-latest)
-        DB_URL=$(echo $SECRET_JSON | jq -r .DB_URL)
-        DB_USERNAME=$(echo $SECRET_JSON | jq -r .DB_USERNAME)
-        DB_PASSWORD=$(echo $SECRET_JSON | jq -r .DB_PASSWORD)
-
-        # 3. Cria/Atualiza o Secret da Aplicação no Kubernetes
-        # Removemos o secret antigo para recriar com os valores novos da AWS
-        kubectl delete secret app-secret --ignore-not-found
-        
-        kubectl create secret generic app-secret \
-          --from-literal=DB_URL="$DB_URL" \
-          --from-literal=DB_USERNAME="$DB_USERNAME" \
-          --from-literal=DB_PASSWORD="$DB_PASSWORD" \
-          --from-literal=MP_USER_ID='2409646693' \
-          --from-literal=MP_EXTERNAL_POS_ID='FIAP001POS' \
-          --from-literal=MP_TOKEN='APP_USR-5511707722892084-042814-00c965a2a4ecf4475115062da61fb13d-2409646693' \
-          --dry-run=client -o yaml | kubectl apply -f -
-
-        # 4. Sobe a Aplicação (SEM O POSTGRES)
-        # Removemos as linhas do postgres-deployment e postgres-secret
+        # 2. Aplica os manifestos (Sem criar secrets manualmente!)
         kubectl apply -f k8s-manifests/app-config.yaml
         kubectl apply -f k8s-manifests/app-deployment.yaml
         kubectl apply -f k8s-manifests/app-service.yaml
-        kubectl apply -f k8s-manifests/hpa.yaml
+        # Se tiver HPA, descomente:
+        # kubectl apply -f k8s-manifests/hpa.yaml
         
     - name: Verify Deployment
       run: |
-        echo "Aguardando rollout do deployment..."
-        kubectl rollout status deployment/app-deployment || true
+        echo "Aguardando rollout..."
+        # O nome aqui deve bater com o "metadata.name" do seu deployment.yaml
+        kubectl rollout status deployment/ms-pagamento || true
         
-        echo "Serviços disponíveis:"
+        echo "Serviços:"
         kubectl get svc
