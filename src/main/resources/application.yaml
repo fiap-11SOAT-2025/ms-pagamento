@@ -3,24 +3,53 @@ server:
 
 spring:
   application:
-    name: ${APP_NAME:ms-pagamento}
+    name: ms-pagamento
+
+  # 1. Importa o segredo ao iniciar a aplicação
+  config:
+    import: "optional:aws-secretsmanager:database-credentials20260106135621376700000001"
+
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      secretsmanager:
+        enabled: true
 
   datasource:
+    # Valores injetados automaticamente pelo Secrets Manager
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
     show-sql: true
 
+# Configurações de Integração (Todas agrupadas sob 'api')
 api:
   mercadopago:
     userId: ${MP_USER_ID}
     externalPosId: ${MP_EXTERNAL_POS_ID}
     token: ${MP_TOKEN}
+  
+  # Novas configurações para comunicação entre microsserviços
   pedido:
-    host: ${MS_PEDIDO_HOST}
+    host: ${MS_PEDIDO_SERVER}
   producao:
-    host: ${MS_PRODUCAO_HOST}
+    host: ${MS_PRODUCAO_SERVER}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: always

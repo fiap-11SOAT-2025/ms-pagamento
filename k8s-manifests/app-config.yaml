@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configmap
+data:
+  APP_PORT: "8080"
+  APP_NAME: "ms-pagamento"

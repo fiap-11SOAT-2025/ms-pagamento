@@ -5,56 +5,33 @@ FROM maven:3.9.5-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# Copiar arquivos de configuração primeiro para cache otimizado
+# Cache de dependências
 COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
+RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
-# Copiar o restante do projeto
+# Compilação
 COPY src ./src
-
-# Compilar o projeto (sem rodar testes)
 RUN ./mvnw clean package -DskipTests
-
-RUN apt-get update && apt-get install -y curl
 
 # ===============================
 # Runtime Stage
 # ===============================
-FROM eclipse-temurin:21-jdk
-
-ARG APP_NAME=ms-pagamento
-ARG APP_PORT=8080
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar ${APP_NAME}.jar
+# Define nome padrão do JAR
+ENV APP_JAR_NAME=ms-pagamento.jar
 
-# Expor a porta configurada
-EXPOSE ${APP_PORT}
+# Copia o JAR gerado
+COPY --from=builder /app/target/*.jar /app/${APP_JAR_NAME}
 
-# Variáveis de ambiente padrão (podem ser sobrescritas no docker-compose)
-ENV DB_URL=""
-ENV DB_USERNAME=""
-ENV DB_PASSWORD=""
-ENV MP_USER_ID=""
-ENV MP_EXTERNAL_POS_ID=""
-ENV MP_TOKEN=""
-ENV MS_PEDIDO_HOST=""
-ENV MS_PRODUCAO_HOST=""
+# Porta padrão
+EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar"]
 
-# Comando de execução
-ENTRYPOINT sh -c "java -jar \
-    -Dserver.port=${APP_PORT} \
-    -Dspring.datasource.url=${DB_URL} \
-    -Dspring.datasource.username=${DB_USERNAME} \
-    -Dspring.datasource.password=${DB_PASSWORD} \
-    -DMP_USER_ID=${MP_USER_ID} \
-    -DMP_EXTERNAL_POS_ID=${MP_EXTERNAL_POS_ID} \
-    -DMP_TOKEN=${MP_TOKEN} \
-    -DMS_PEDIDO_HOST=${MS_PEDIDO_HOST} \
-    -DMS_PRODUCAO_HOST=${MS_PRODUCAO_HOST} \
-    ${APP_NAME}.jar"
+# Entrypoint usando exec form para melhor gerenciamento de sinais
+ENTRYPOINT ["sh", "-c", "java -jar /app/${APP_JAR_NAME}"]

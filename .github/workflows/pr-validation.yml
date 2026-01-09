@@ -1,0 +1,94 @@
+name: PR Validation - Build, Tests & SonarQube
+
+on:
+  pull_request:
+    branches: ["main", "develop"]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '21'
+  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+jobs:
+  build-and-test:
+    name: Build, Test & Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Cache SonarQube packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: Build and Run Tests with Coverage
+      run: |
+        chmod +x ./mvnw
+        ./mvnw clean verify -B
+
+    - name: Check JaCoCo Coverage Report
+      run: |
+        if [ -f target/site/jacoco/jacoco.xml ]; then
+          echo "JaCoCo report generated successfully"
+          # Extract coverage percentage from report
+          COVERAGE=$(grep -oP 'INSTRUCTION.*?covered="\K[0-9]+' target/site/jacoco/jacoco.xml | head -1)
+          MISSED=$(grep -oP 'INSTRUCTION.*?missed="\K[0-9]+' target/site/jacoco/jacoco.xml | head -1)
+          if [ -n "$COVERAGE" ] && [ -n "$MISSED" ]; then
+            TOTAL=$((COVERAGE + MISSED))
+            if [ $TOTAL -gt 0 ]; then
+              PERCENTAGE=$((COVERAGE * 100 / TOTAL))
+              echo "Coverage: ${PERCENTAGE}%"
+              if [ $PERCENTAGE -lt 70 ]; then
+                echo "::error::Coverage is below 70% threshold: ${PERCENTAGE}%"
+                exit 1
+              else
+                echo "::notice::Coverage meets 70% threshold: ${PERCENTAGE}%"
+              fi
+            fi
+          fi
+        else
+          echo "::error::JaCoCo report not found at target/site/jacoco/jacoco.xml"
+          exit 1
+        fi
+
+    - name: SonarQube Scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      run: |
+        ./mvnw sonar:sonar \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.projectKey=fiap-11SOAT-2025_ms-pagamento \
+          -B
+
+    - name: Upload JaCoCo Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: jacoco-report
+        path: |
+          target/site/jacoco/
+          target/surefire-reports/
+        retention-days: 30
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: target/surefire-reports/
+        retention-days: 30

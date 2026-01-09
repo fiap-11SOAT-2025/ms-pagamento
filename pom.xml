@@ -29,6 +29,13 @@
 	<properties>
 		<java.version>21</java.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
+		<!-- SonarQube Configuration -->
+		<sonar.host.url>${env.SONAR_HOST_URL}</sonar.host.url>
+		<sonar.projectKey>fiap-11SOAT-2025_ms-pagamento</sonar.projectKey>
+		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.exclusions>**/config/**,**/dto/**,**/entities/**,**/enums/**,**/exception/**,**/persistence/**,**/*Application.java</sonar.exclusions>
+		<sonar.coverage.exclusions>**/config/**,**/dto/**,**/entities/**,**/enums/**,**/exception/**,**/persistence/**,**/*Application.java</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -47,6 +54,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-secrets-manager</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.google.zxing</groupId>
 			<artifactId>core</artifactId>
@@ -87,6 +103,23 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>7.20.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit-platform-engine</artifactId>
+			<version>7.20.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<version>1.11.4</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -124,7 +157,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.14</version>
+				<version>0.8.12</version>
 				<executions>
 					<execution>
 						<goals>
@@ -150,7 +183,43 @@
 							</excludes>
 						</configuration>
 					</execution>
+					<execution>
+						<id>jacoco-check</id>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.70</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+							<excludes>
+								<exclude>org/fiap/ms_pagamento/presentation/dto/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/infrastructure/mappers/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/infrastructure/persistence/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/infrastructure/config/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/core/enums/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/MsPagamentoApplication.class</exclude>
+								<exclude>org/fiap/ms_pagamento/core/exceptions/**/*.class</exclude>
+								<exclude>org/fiap/ms_pagamento/infrastructure/exception/**/*.class</exclude>
+							</excludes>
+						</configuration>
+					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>4.0.0.4121</version>
 			</plugin>
 		</plugins>
 	</build>
