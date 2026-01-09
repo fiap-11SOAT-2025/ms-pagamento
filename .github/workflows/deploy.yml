@@ -62,7 +62,15 @@ jobs:
         # 1. Atualiza a imagem no manifesto
         sed -i 's|REPLACE_ME_IMAGE_URL|${{ steps.build-image.outputs.image }}|g' k8s-manifests/app-deployment.yaml
         
-        # 2. Aplica os manifestos (Sem criar secrets manualmente!)
+        # 2. CRÍTICO: Atualiza as Credenciais da AWS no Cluster
+        # Isso garante que o Pod tenha permissão para acessar o Secrets Manager
+        kubectl delete secret aws-credentials --ignore-not-found
+        kubectl create secret generic aws-credentials \
+          --from-literal=aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          --from-literal=aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          --from-literal=aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}
+
+        # 3. Aplica os manifestos
         kubectl apply -f k8s-manifests/app-config.yaml
         kubectl apply -f k8s-manifests/app-deployment.yaml
         kubectl apply -f k8s-manifests/app-service.yaml
@@ -71,8 +79,6 @@ jobs:
     - name: Verify Deployment
       run: |
         echo "Aguardando rollout..."
-        # O nome aqui deve bater com o "metadata.name" do seu deployment.yaml
         kubectl rollout status deployment/ms-pagamento || true
-        
         echo "Serviços:"
         kubectl get svc
