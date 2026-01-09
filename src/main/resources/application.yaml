@@ -41,9 +41,9 @@ api:
   
   # Novas configurações para comunicação entre microsserviços
   pedido:
-    host: ${MS_PEDIDO_SERVER}
+    host: http://ms-pedido:8080
   producao:
-    host: ${MS_PRODUCAO_SERVER}
+    host: http://ms-producao:8080
 
 management:
   endpoints:
