@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-pagamento
+  labels:
+    app: ms-pagamento
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-pagamento
+  template:
+    metadata:
+      labels:
+        app: ms-pagamento
+    spec:
+      containers:
+        - name: ms-pagamento-container
+          # O pipeline substitui isto pela imagem real
+          image: REPLACE_ME_IMAGE_URL
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          
+          # Recursos (Mantive os originais, ajuste se necessário)
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1.5Gi"
+
+          # Carrega apenas configurações não-sensíveis (ex: Profiles)
+          envFrom:
+            - configMapRef:
+                name: app-configmap
+            # REMOVIDO: - secretRef: name: app-secret 
+            # (Já não precisamos dele, a app busca tudo na AWS direto)
+
+          env:
+            # 1. Ativa a integração com AWS Secrets Manager
+            - name: SPRING_CLOUD_AWS_SECRETSMANAGER_ENABLED
+              value: "true"
+            - name: AWS_REGION
+              value: "us-east-1"
+
+            # 2. Injeta as Credenciais da AWS (Essencial para o Spring iniciar)
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_secret_access_key
+            - name: AWS_SESSION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws_session_token
+
+          # Health Checks (Ajudam o K8s a saber se a app travou)
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
