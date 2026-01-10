@@ -88,6 +88,13 @@ public class PagamentoServiceImpl implements PagamentoUseCases {
         return pagamentoGateway.findAll();
     }
 
+    @Override
+    public Pagamento geraPagamento(String idPedido) {
+        Pagamento pagamento = new Pagamento(idPedido, null,null, StatusPagamentoEnum.PENDENTE_QRCODE.getCodigo());
+        return pagamentoGateway.save(pagamento)
+                .orElseThrow(() -> new RuntimeException("Erro ao salvar pagamento!"));
+    }
+
     private MercadoPagoOrderResponseDTO geraPedidoParaPagamentoMercadoPago(PedidoDTO pedido){
 
         BigDecimal valorTotal = pedido.valorTotal();

@@ -19,4 +19,6 @@ public interface PagamentoUseCases {
     void atualizaPagamentoPedido(Pagamento pagamento);
 
     List<Pagamento> buscaPagamentos();
+
+    Pagamento geraPagamento(String idPedido);
 }

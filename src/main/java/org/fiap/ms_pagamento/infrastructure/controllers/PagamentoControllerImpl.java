@@ -17,6 +17,10 @@ public class PagamentoControllerImpl implements PagamentoController {
         this.pagamentoUseCases = pagamentoUseCases;
     }
 
+    @Override
+    public Pagamento geraPagamento(String idPedido) {
+        return pagamentoUseCases.geraPagamento(idPedido);
+    }
 
     @Override
     public Pagamento geraQrCodePagamentoMercadoPago(String idPedido) {
