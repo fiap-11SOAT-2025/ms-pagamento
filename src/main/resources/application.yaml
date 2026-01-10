@@ -7,7 +7,7 @@ spring:
 
   # 1. Importa o segredo ao iniciar a aplicação
   config:
-    import: "optional:aws-secretsmanager:database-credentials20260106135621376700000001"
+    import: "optional:aws-secretsmanager:database-credentials20260110174319640800000001"
 
   cloud:
     aws:
