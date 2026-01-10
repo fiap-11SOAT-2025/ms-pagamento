@@ -20,6 +20,12 @@ public class PagamentoApiController {
     private PagamentoController pagamentoController;
     private PagamentoResponseMapper mapper;
 
+    @PostMapping("/gerar/{idPedido}")
+    public ResponseEntity<PagamentoDTO> geraPagamento(@PathVariable String idPedido){
+        Pagamento pagamento = pagamentoController.geraPagamento(idPedido);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.entidadeParaDto(pagamento));
+    }
+
     @PostMapping("/gerar-qrCode/{idPedido}")
     public ResponseEntity<PagamentoDTO> gerarQrCodePagamentoMercadoPago(@PathVariable String idPedido){
         Pagamento pagamento= pagamentoController.geraQrCodePagamentoMercadoPago(idPedido);

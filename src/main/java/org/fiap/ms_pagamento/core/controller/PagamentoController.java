@@ -13,4 +13,6 @@ public interface PagamentoController {
     List<Pagamento> buscaPagamentos();
 
     Pagamento consultaStatusPagamento(String idPedido);
+
+    Pagamento geraPagamento(String idPedido);
 }
