@@ -78,7 +78,7 @@ class ProducaoClientTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> producaoClient.criaStatusRecebidoPedido(statusDTO));
 
-        assertTrue(ex.getMessage().contains("Erro ao buscar statusPedido com o pedidoId: pedido456"));
+        assertTrue(ex.getMessage().contains("Erro ao criar status com o pedidoId: pedido456"));
     }
 
     @Test
@@ -95,6 +95,6 @@ class ProducaoClientTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> producaoClient.criaStatusRecebidoPedido(statusDTO));
 
-        assertTrue(ex.getMessage().contains("Erro ao buscar statusPedido com o pedidoId: pedido789"));
+        assertTrue(ex.getMessage().contains("Erro ao criar status com o pedidoId: pedido789"));
     }
 }
