@@ -7,7 +7,7 @@ spring:
 
   # 1. Importa o segredo ao iniciar a aplicação
   config:
-    import: "optional:aws-secretsmanager:database-credentials20260106135621376700000001"
+    import: "optional:aws-secretsmanager:database-credentials20260110174319640800000001"
 
   cloud:
     aws:
@@ -41,9 +41,9 @@ api:
   
   # Novas configurações para comunicação entre microsserviços
   pedido:
-    host: ${MS_PEDIDO_SERVER}
+    host: http://ms-pedido:8080
   producao:
-    host: ${MS_PRODUCAO_SERVER}
+    host: http://ms-producao:8080
 
 management:
   endpoints:
