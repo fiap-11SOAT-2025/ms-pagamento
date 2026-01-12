@@ -31,7 +31,9 @@ public class ProducaoClient implements ProducaoGateway {
                     .uri(endpoint)
                     .bodyValue(statusPedidoDTO)
                     .exchangeToMono(response -> {
-                        if (response.statusCode().is4xxClientError()) {
+                        if (response.statusCode().is2xxSuccessful()) {
+                            return Mono.empty(); // ou Mono.just(...) se quiser ler o corpo
+                        } else if (response.statusCode().is4xxClientError()) {
                             return response.bodyToMono(String.class)
                                     .flatMap(body -> Mono.error(new RecursoNaoEncontradoExcecao(
                                             "StatusPedido não encontrado com o pedidoId: " + statusPedidoDTO.pedidoId() + ". Detalhes: " + body
@@ -52,7 +54,7 @@ public class ProducaoClient implements ProducaoGateway {
         } catch (RecursoNaoEncontradoExcecao e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao buscar statusPedido com o pedidoId: " + statusPedidoDTO.pedidoId(), e);
+            throw new RuntimeException("Erro ao criar status com o pedidoId: " + statusPedidoDTO.pedidoId(), e);
         }
     }
 }
